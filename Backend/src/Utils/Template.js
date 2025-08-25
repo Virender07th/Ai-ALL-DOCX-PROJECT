@@ -23,7 +23,7 @@ export const forgotPasswordTemplate = (email, resetUrl) => `
   
   <p>We received a request to reset your password. Click the button below to reset it:</p>
   
-  ${createButton(resetUrl, 'Reset Password')}
+  ${createButton(resetUrl, "Reset Password")}
   
   <p>Or copy and paste this link into your browser:</p>
   <p style="background-color: #f8f9fa; padding: 10px; border-radius: 4px; font-family: monospace; word-break: break-all; font-size: 14px;">

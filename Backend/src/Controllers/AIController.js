@@ -2,8 +2,6 @@ import axios from "axios";
 import { AiEndpoints } from "../Utils/API.js";
 import FormData from "form-data";
 
-
-// Generic function to call FastAPI
 const callFastAPI = async (endpoint, data, res) => {
   try {
     const response = await axios.post(endpoint, data, {
@@ -13,10 +11,8 @@ const callFastAPI = async (endpoint, data, res) => {
     const apiData = response.data;
 
     if (apiData.success) {
-      // Now questions are directly on apiData.questions
       const questions = apiData.questions || [];
-      console.log("question" , questions);
-      
+      console.log("question", questions);
 
       return res.status(200).json({
         success: true,
@@ -29,7 +25,7 @@ const callFastAPI = async (endpoint, data, res) => {
       });
     }
   } catch (error) {
-    console.error(`❌ Error calling ${endpoint}:`, error.message);
+    console.error(`Error calling ${endpoint}:`, error.message);
 
     return res.status(500).json({
       success: false,
@@ -41,7 +37,7 @@ const callFastAPI = async (endpoint, data, res) => {
 
 const InterviewQuestion = async (req, res) => {
   console.log(req.body);
-  
+
   if (!req.body.topic && !req.body.url) {
     return res.status(400).json({
       success: false,
@@ -63,17 +59,18 @@ const QuizQuestion = async (req, res) => {
 
 const InterviewQuestionWithFile = async (req, res) => {
   if (!req.file) {
-    return res.status(400).json({ success: false, message: "File is required" });
+    return res
+      .status(400)
+      .json({ success: false, message: "File is required" });
   }
 
   try {
     const formData = new FormData();
     formData.append("file", req.file.buffer, {
       filename: req.file.originalname,
-      contentType: req.file.mimetype
+      contentType: req.file.mimetype,
     });
 
-    // ✅ get numberOfQuestions from req.body or default to 5
     const numberOfQuestions = req.body?.numberOfQuestions || 5;
     formData.append("numberOfQuestions", numberOfQuestions);
 
@@ -86,24 +83,26 @@ const InterviewQuestionWithFile = async (req, res) => {
     res.status(200).json(response.data);
   } catch (error) {
     console.error("Upload error:", error.response?.data || error.message);
-    res.status(500).json({ success: false, message: "Upload error", error: error.message });
+    res
+      .status(500)
+      .json({ success: false, message: "Upload error", error: error.message });
   }
 };
 
-
 const QuizQuestionWithFile = async (req, res) => {
   if (!req.file) {
-    return res.status(400).json({ success: false, message: "File is required" });
+    return res
+      .status(400)
+      .json({ success: false, message: "File is required" });
   }
 
   try {
     const formData = new FormData();
     formData.append("file", req.file.buffer, {
       filename: req.file.originalname,
-      contentType: req.file.mimetype
+      contentType: req.file.mimetype,
     });
 
-    // ✅ get numberOfQuestions from req.body or default to 5
     const numberOfQuestions = req.body?.numberOfQuestions || 5;
     formData.append("numberOfQuestions", numberOfQuestions);
 
@@ -116,34 +115,36 @@ const QuizQuestionWithFile = async (req, res) => {
     res.status(200).json(response.data);
   } catch (error) {
     console.error("Upload error:", error.response?.data || error.message);
-    res.status(500).json({ success: false, message: "Upload error", error: error.message });
+    res
+      .status(500)
+      .json({ success: false, message: "Upload error", error: error.message });
   }
 };
 
-
 const UploadFile = async (req, res) => {
   if (!req.file) {
-    return res.status(400).json({ success: false, message: "File is required" });
+    return res
+      .status(400)
+      .json({ success: false, message: "File is required" });
   }
 
   try {
     const formData = new FormData();
     formData.append("file", req.file.buffer, {
       filename: req.file.originalname,
-      contentType: req.file.mimetype
+      contentType: req.file.mimetype,
     });
 
-    // If this is your AI API endpoint, make sure it's correct
-    const response = await axios.post(
-      AiEndpoints.Upload_File_API, // ✅ Correct URL
-      formData,
-      { headers: formData.getHeaders() }
-    );
+    const response = await axios.post(AiEndpoints.Upload_File_API, formData, {
+      headers: formData.getHeaders(),
+    });
 
     res.status(200).json(response.data);
   } catch (error) {
     console.error("Upload error:", error.response?.data || error.message);
-    res.status(500).json({ success: false, message: "Upload error", error: error.message });
+    res
+      .status(500)
+      .json({ success: false, message: "Upload error", error: error.message });
   }
 };
 const ChatOnDocs = async (req, res) => {
@@ -173,7 +174,7 @@ const ChatOnDocs = async (req, res) => {
       answer: apiData.response?.answer || "",
     });
   } catch (error) {
-    console.error(`❌ Error calling Chat_On_Docs_API:`, error);
+    console.error(`Error calling Chat_On_Docs_API:`, error);
 
     return res.status(500).json({
       success: false,
@@ -192,4 +193,12 @@ const ChatOnURL = async (req, res) => {
   await callFastAPI(AiEndpoints.Chat_On_URL_API, req.body, res);
 };
 
-export { InterviewQuestion,  InterviewQuestionWithFile ,  QuizQuestion , QuizQuestionWithFile, UploadFile , ChatOnDocs , ChatOnURL };
+export {
+  InterviewQuestion,
+  InterviewQuestionWithFile,
+  QuizQuestion,
+  QuizQuestionWithFile,
+  UploadFile,
+  ChatOnDocs,
+  ChatOnURL,
+};

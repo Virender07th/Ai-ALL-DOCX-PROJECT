@@ -6,7 +6,7 @@ import mailSender from "../Utils/mailSender.js";
 import jwt from "jsonwebtoken";
 import Profile from "../Models/Profile.js";
 import crypto from "crypto"
- import { otpTemplate , changePasswordTemplate, resetPasswordSuccessTemplate, forgotPasswordTemplate } from "../Utils/Template.js";
+ import {  changePasswordTemplate, resetPasswordSuccessTemplate, forgotPasswordTemplate } from "../Utils/Template.js";
 
 
 
@@ -130,7 +130,6 @@ const sendOTP = async (req, res) => {
   try {
     const { email } = req.body;
 
-    // Check if user already exists (for signup)
     const existingUser = await User.findOne({ email });
     if (existingUser) {
       return res.status(400).json({
@@ -138,8 +137,7 @@ const sendOTP = async (req, res) => {
         message: `User is already registered`,
       });
     }
-
-    // Generate unique OTP
+    
     let otp, result;
     do {
       otp = otpGenerator.generate(6, {
@@ -150,22 +148,8 @@ const sendOTP = async (req, res) => {
       result = await OTP.findOne({ otp });
     } while (result);
 
-    // Store OTP in DB
     await OTP.create({ email, otp });
     console.log("Generated OTP:", otp);
-
-    // Send OTP email
-    // try {
-    //   const emailResponse = await mailSender(email, "Your OTP Code", otpTemplate(otp));
-    //   console.log("Email sent successfully:", emailResponse);
-    // } catch (emailError) {
-    //   console.error("Error sending OTP email:", emailError);
-    //   return res.status(500).json({
-    //     success: false,
-    //     message: "Failed to send OTP email",
-    //     error: emailError.message,
-    //   });
-    // }
 
     return res.status(200).json({
       success: true,
@@ -218,7 +202,6 @@ const changePassword = async (req, res) => {
       });
     }
 
-    // Check if old password matches
     const isPasswordMatch = await bcrypt.compare(password, userDetails.password);
     if (!isPasswordMatch) {
       return res.status(401).json({
@@ -230,7 +213,7 @@ const changePassword = async (req, res) => {
     userDetails.password = newPassword;
     await userDetails.save(); 
 
-    // ✅ Send confirmation email
+
     try {
       const emailResponse = await mailSender(
         userDetails.email,
@@ -269,9 +252,8 @@ const forgotPassword = async (req, res) => {
       return res.status(404).json({ success: false, message: "User not found" });
     }
 
-    // Generate reset token (random string)
     const resetToken = crypto.randomBytes(32).toString("hex");
-    const resetTokenExpiry = Date.now() + 15 * 60 * 1000; // 15 minutes
+    const resetTokenExpiry = Date.now() + 15 * 60 * 1000; 
 
     user.resetPasswordToken = resetToken;
     user.resetPasswordExpires = resetTokenExpiry;
@@ -279,7 +261,6 @@ const forgotPassword = async (req, res) => {
 
     const resetUrl = `${process.env.FRONTEND_URL}/reset-password/${resetToken}`;
 
-    // Send email
     await mailSender(
       user.email,
       "Password Reset",
@@ -308,7 +289,7 @@ const resetPassword = async (req, res) => {
 
     const user = await User.findOne({
       resetPasswordToken,
-      resetPasswordExpires: { $gt: Date.now() }, // check expiry
+      resetPasswordExpires: { $gt: Date.now() }, 
     });
 
     if (!user) {
@@ -316,7 +297,6 @@ const resetPassword = async (req, res) => {
         .status(400)
         .json({ success: false, message: "Invalid or expired token" });
     }
-    // Clear reset fields
     user.resetPasswordToken = null;
     user.resetPasswordExpires = null;
     user.password =password;

@@ -1,16 +1,14 @@
 import Profile from "../Models/Profile.js";
 import uploadImageToCloudinary from "../Utils/imageUploader.js";
-import User from "../Models/User.js"
-
-// UserProfile controller
+import User from "../Models/User.js";
 
 const getUserProfile = async (req, res) => {
   try {
     const userId = req.user._id;
 
     const profile = await User.findById(userId)
-  .select("-password -token -resetPasswordToken -resetPasswordExpires")
-  .populate("additionalDetails");
+      .select("-password -token -resetPasswordToken -resetPasswordExpires")
+      .populate("additionalDetails");
 
     if (!profile) {
       return res.status(404).json({
@@ -32,7 +30,7 @@ const getUserProfile = async (req, res) => {
   }
 };
 
- const updateDisplayPicture = async (req, res) => {
+const updateDisplayPicture = async (req, res) => {
   try {
     const userId = req.user._id;
 
@@ -42,11 +40,9 @@ const getUserProfile = async (req, res) => {
         message: "No image file provided",
       });
     }
-
-    // Upload image to Cloudinary
     const uploadResult = await uploadImageToCloudinary(
       req.file.path,
-      process.env.FOLDER_NAME, // cloudinary folder
+      process.env.FOLDER_NAME,
       300,
       "auto"
     );
@@ -58,7 +54,6 @@ const getUserProfile = async (req, res) => {
       });
     }
 
-    // Update profile
     const updatedProfile = await Profile.findOneAndUpdate(
       { userId },
       { $set: { imageUrl: uploadResult.secure_url } },
@@ -84,7 +79,6 @@ const updateUserProfile = async (req, res) => {
     const userId = req.user._id;
     const { bio, location, gender, contactNumber } = req.body;
 
-    // Check if at least one field is provided
     if (!bio || !location || !contactNumber || !gender) {
       return sendError(res, 400, "No data provided to update");
     }
@@ -96,19 +90,19 @@ const updateUserProfile = async (req, res) => {
     if (gender !== undefined) {
       const allowedGenders = ["Male", "Female", "Other Gender"];
       if (!allowedGenders.includes(gender)) {
-        return res.status(400).json({ success: false, message: "Invalid gender value" });
+        return res
+          .status(400)
+          .json({ success: false, message: "Invalid gender value" });
       }
       updateData.gender = gender;
     }
 
-    // Update or create profile
     const updatedProfile = await Profile.findOneAndUpdate(
       { userId },
       { $set: updateData },
       { new: true, upsert: true }
     );
 
-    // Fetch user with populated profile
     const user = await User.findById(userId).populate("additionalDetails");
 
     res.status(200).json({
@@ -118,10 +112,11 @@ const updateUserProfile = async (req, res) => {
     });
   } catch (error) {
     console.error("updateUserProfile error:", error);
-    res.status(500).json({ success: false, message: "Server error updating profile" });
+    res
+      .status(500)
+      .json({ success: false, message: "Server error updating profile" });
   }
 };
-
 
 const deleteUserProfile = async (req, res) => {
   const session = await mongoose.startSession();
@@ -129,11 +124,15 @@ const deleteUserProfile = async (req, res) => {
   try {
     const userId = req.user._id;
 
-    // Delete profile
-    const deletedProfile = await Profile.findOneAndDelete({ user: userId }, { session });
-    
-    // Delete user
-    const deletedUser = await User.findOneAndDelete({ _id: userId }, { session });
+    const deletedProfile = await Profile.findOneAndDelete(
+      { user: userId },
+      { session }
+    );
+
+    const deletedUser = await User.findOneAndDelete(
+      { _id: userId },
+      { session }
+    );
 
     if (!deletedProfile || !deletedUser) {
       await session.abortTransaction();
@@ -163,7 +162,6 @@ const deleteUserProfile = async (req, res) => {
     });
   }
 };
-
 
 export {
   getUserProfile,

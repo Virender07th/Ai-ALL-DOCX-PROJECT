@@ -11,7 +11,7 @@ const userSchema = new mongoose.Schema(
     email: {
       type: String,
       required: function () {
-        return this.authProvider === "local"; // Only required for local users
+        return this.authProvider === "local";
       },
       unique: true,
       lowercase: true,
@@ -21,7 +21,7 @@ const userSchema = new mongoose.Schema(
     password: {
       type: String,
       required: function () {
-        return this.authProvider === "local"; // password only for local
+        return this.authProvider === "local";
       },
     },
     token: { type: String, default: null },
@@ -39,7 +39,6 @@ const userSchema = new mongoose.Schema(
       ref: "UserProfile",
     },
 
-    // 🌍 OAuth fields
     googleId: { type: String, unique: true, sparse: true },
     facebookId: { type: String, unique: true, sparse: true },
     profilePicture: { type: String },

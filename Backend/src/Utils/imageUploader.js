@@ -6,7 +6,7 @@ const uploadImageToCloudinary = async (filePath, folder, height, quality) => {
 
   if (height) {
     options.height = height;
-    options.crop = "scale"; // ensures proper resize
+    options.crop = "scale";
   }
   if (quality) {
     options.quality = quality;
@@ -15,12 +15,10 @@ const uploadImageToCloudinary = async (filePath, folder, height, quality) => {
   try {
     const result = await cloudinary.uploader.upload(filePath, options);
 
-    // Remove the file from local uploads after successful upload
     fs.unlinkSync(filePath);
 
     return result;
   } catch (error) {
-    // Clean up file if upload fails
     if (fs.existsSync(filePath)) {
       fs.unlinkSync(filePath);
     }

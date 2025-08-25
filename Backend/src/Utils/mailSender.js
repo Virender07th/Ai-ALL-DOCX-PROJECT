@@ -5,17 +5,17 @@ const mailSender = async (email, title, body) => {
     let transporter = nodemailer.createTransport({
       host: process.env.MAIL_HOST,
       port: 587,
-      secure: false, // upgrade later with STARTTLS
+      secure: false,
       auth: {
         user: process.env.MAIL_USER,
-        pass: process.env.MAIL_PASS, // ✅ corrected
+        pass: process.env.MAIL_PASS,
       },
     });
 
     let info = await transporter.sendMail({
       from: `"AI All Docx Project" <${process.env.MAIL_USER}>`,
       to: email,
-      subject: title, // ✅ corrected
+      subject: title,
       html: body,
     });
 
