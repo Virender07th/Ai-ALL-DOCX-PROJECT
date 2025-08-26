@@ -1,5 +1,3 @@
-# app/Fallback/SearchFallBack.py
-
 import logging
 from fastapi import HTTPException
 from app.Tools.SearchTool.DuckDuckgoSearch import search_snippet_using_DuckDuckGoSearchRun
@@ -88,8 +86,8 @@ def Search_article_by_topic(topic: str, regenerate: bool = False) -> str:
     search_engines = [
         ("Tavily", search_snippet_using_tavily),
         ("DuckDuckGo", search_snippet_using_DuckDuckGoSearchRun),
-        # ("Exa", search_snippet_using_exa),
-        # ("Serper", search_snippet_using_serper),
+        ("Exa", search_snippet_using_exa),
+        ("Serper", search_snippet_using_serper),
     ]
 
     for name, engine in search_engines:
