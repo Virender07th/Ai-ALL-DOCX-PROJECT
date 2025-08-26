@@ -2,35 +2,33 @@
 fastapi
 uvicorn
 
-# LangChain
+# LangChain ecosystem
 langchain
 langchain-core
 langchain-community
-
-# Optional integrations (comment out unless needed)
 langchain-groq
 langchain-huggingface
-# langchain-google-genai
+langchain-google-genai
 langchain-unstructured
 langchain-exa
 langchain-tavily
-
-# Vector DB (lightweight only if you use it)
-faiss-cpu
-
-# Embeddings
+huggingface_hub[hf_xet]
 sentence-transformers
-
-# Document loaders
-pymupdf
+# Vector DB support
+faiss-cpu  # Optional: add if using FAISS
+# Document loading & parsing
+unstructured[all-docs]
+PyMuPDF
+newspaper3k
+lxml-html-clean  # fixed name from `lxml_html_clean`
 beautifulsoup4
 docx2txt
-lxml-html-clean
-newspaper3k
+json5
 
-# Utils
+# Utilities
 python-dotenv
 httpx
 pydantic
-ddgs
+ddgs  # DuckDuckGo search wrapper
 firecrawl-py
+pymupdf   

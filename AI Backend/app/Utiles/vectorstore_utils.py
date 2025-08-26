@@ -64,4 +64,4 @@ def ingest_file_to_faiss(path: str, namespace: Optional[str] = "default", source
     vectorstore.add_texts(chunks, metadatas=metadatas, ids=ids)
     metadata_store[namespace].extend(metadatas)
     
-    return {"namespace": namespace, "source": source_name, "chunks": len(chunks), "ids_added": len(ids)}
+    return {"namespace": namespace, "source": source_name, "chunks": len(chunks), "ids_added": len(ids)}   
