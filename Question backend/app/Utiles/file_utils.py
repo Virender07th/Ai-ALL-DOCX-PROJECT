@@ -3,11 +3,6 @@ import uuid
 import tempfile
 import logging
 import fitz  # PyMuPDF
-from unstructured.partition.docx import partition_docx
-from unstructured.partition.pptx import partition_pptx
-from unstructured.partition.text import partition_text
-from unstructured.partition.csv import partition_csv
-from unstructured.partition.html import partition_html
 
 from app.Tools.URLTOOL.ArticleExtractor import extract_article_from_url
 
@@ -56,29 +51,10 @@ def extract_text_from_pdf(path: str) -> str:
         return combined
     return "" 
 
-# --- Extract text from other formats ---
-def extract_text_unstructured(path: str, ext: str) -> str:
-    if ext == ".docx":
-        elements = partition_docx(filename=path)
-    elif ext == ".pptx":
-        elements = partition_pptx(filename=path)
-    elif ext in [".txt", ".md"]:
-        elements = partition_text(filename=path)
-    elif ext == ".csv":
-        elements = partition_csv(filename=path)
-    elif ext in [".html", ".htm"]:
-        elements = partition_html(filename=path)
-    else:
-        with open(path, "r", encoding="utf-8", errors="ignore") as f:
-            return f.read()
-    text = "\n\n".join(el.text for el in elements if el.text)
-    return text
-
 def load_file_text(path: str) -> str:
     ext = os.path.splitext(path)[1].lower()
-    if ext == ".pdf":
-        return extract_text_from_pdf(path)
-    return extract_text_unstructured(path, ext)
+    return extract_text_from_pdf(path)
+
 
 def extract_article_text(url: str) -> str:
     return extract_article_from_url(url)

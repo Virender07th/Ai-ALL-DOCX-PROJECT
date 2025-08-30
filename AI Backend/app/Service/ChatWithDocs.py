@@ -280,7 +280,18 @@ llm = ChatGroq(model=os.getenv("GROQ_MODEL", "llama3-70b-8192"),
 def handle_file_upload(upload_file):
     temp_path = save_uploadfile_temp(upload_file)
     result = ingest_file_to_faiss(temp_path, source_name=upload_file.filename)
-    return result
+
+    if not result:
+        raise ValueError("Vectorstore ingestion returned no result")
+
+    return {
+        "filename": upload_file.filename,
+        "temp_path": temp_path,
+        "namespace": "default",
+        "chunks": result.get("chunks") if isinstance(result, dict) else None,
+        "text_length": result.get("text_length") if isinstance(result, dict) else None
+    }
+
 
 def chat_with_docs(topic: str, namespace: str = "default", top_k: int = 4, include_sources: bool = False) -> Dict:
     if namespace not in vectorstores:

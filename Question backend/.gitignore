@@ -1,0 +1,86 @@
+# -------------------------
+# Python
+# -------------------------
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+dist/
+eggs/
+.eggs/
+lib/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+htmlcov/
+.tox/
+.coverage
+.cache
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.ipynb_checkpoints
+
+# -------------------------
+# Virtual environments
+# -------------------------
+.env
+.venv
+env/
+venv/
+
+# -------------------------
+# IDE / Editor
+# -------------------------
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# -------------------------
+# Logs & DBs
+# -------------------------
+*.log
+*.sqlite3
+*.db
+
+# -------------------------
+# AI / ML Cache & Models
+# -------------------------
+# Hugging Face cache
+huggingface/
+~/.cache/huggingface/
+.huggingface/
+
+# Torch / Transformers / LangChain
+.cache/
+models/
+checkpoints/
+*.pt
+*.bin
+*.pth
+*.ckpt
+*.onnx
+
+# Datasets
+data/
+datasets/
+*.csv
+*.tsv
+*.jsonl
+*.parquet
+*.zip
+*.tar
+*.gz
+
+# -------------------------
+# OS Files
+# -------------------------
+.DS_Store
+Thumbs.db

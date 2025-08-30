@@ -16,7 +16,11 @@ metadata_store: Dict[str, List[Dict]] = {}
 # Load embeddings once (global)
 # -------------------------------
 embeddings = HuggingFaceEmbeddings(model_name="sentence-transformers/all-MiniLM-L6-v2")
-EMB_DIM = 768  # fixed dimension for all-mpnet-base-v2
+try:
+    EMB_DIM = len(embeddings.embed_query("dimension test"))
+except Exception as e:
+    EMB_DIM = 768  # fallback (not recommended)
+
 
 # -------------------------------
 # Vectorstore creation
@@ -52,16 +56,17 @@ def ingest_file_to_faiss(path: str, namespace: Optional[str] = "default", source
     if not text.strip():
         raise ValueError("No text extracted from file.")
 
-    # Split text into chunks
     chunks = chunk_text(text)
     ids = [str(uuid.uuid4()) for _ in chunks]
 
-    # Add to vectorstore
     vectorstore = get_or_create_vectorstore(namespace)
     metadatas = [{"source": source_name, "chunk_index": i} for i in range(len(chunks))]
-    
-    # Add all chunks in batch
     vectorstore.add_texts(chunks, metadatas=metadatas, ids=ids)
     metadata_store[namespace].extend(metadatas)
-    
-    return {"namespace": namespace, "source": source_name, "chunks": len(chunks), "ids_added": len(ids)}   
+
+    return {
+        "namespace": namespace,
+        "source": source_name,
+        "chunks": len(chunks),
+        "ids_added": len(ids),
+    }

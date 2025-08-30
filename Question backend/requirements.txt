@@ -7,25 +7,20 @@ langchain
 langchain-core
 langchain-community
 langchain-groq
+langchain-chroma
 langchain-huggingface
 langchain-google-genai
 langchain-unstructured
 langchain-exa
 langchain-tavily
 huggingface_hub[hf_xet]
-# Vector DB support
-faiss-cpu  # Optional: add if using FAISS
-# Embedding models
-sentence-transformers  # Required by HuggingFaceEmbeddings
-# Document loading & parsing
-unstructured[all-docs]
-PyMuPDF
+
 newspaper3k
 lxml-html-clean  # fixed name from `lxml_html_clean`
 beautifulsoup4
 docx2txt
 json5
-pdf2image
+
 # Utilities
 python-dotenv
 httpx
@@ -33,3 +28,4 @@ pydantic
 ddgs  # DuckDuckGo search wrapper
 firecrawl-py
 pymupdf
+python-multipart
