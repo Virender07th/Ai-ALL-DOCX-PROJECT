@@ -8,7 +8,7 @@ import {
   changePassword,
   resetPassword,
   forgotPassword,
-} from "../Controllers/AuthController.js"; 
+} from "../Controllers/AuthController.js";
 import auth from "../Middleware/auth.middlewares.js";
 import { Strategy as GoogleStrategy } from "passport-google-oauth20";
 import { Strategy as FacebookStrategy } from "passport-facebook";
@@ -17,8 +17,7 @@ import Profile from "../Models/Profile.js";
 
 const router = express.Router();
 
-
-// Local Auth 
+// Local Auth
 router.post("/send-otp", sendOTP);
 router.post("/signup", signUp);
 router.post("/login", login);
@@ -26,13 +25,13 @@ router.post("/change-password", auth, changePassword);
 router.post("/forgot-password", forgotPassword);
 router.post("/reset-password", resetPassword);
 
-// Google Login
+// --- Google OAuth ---
 passport.use(
   new GoogleStrategy(
     {
       clientID: process.env.GOOGLE_CLIENT_ID,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-      callbackURL:"https://ai-all-docx-project.vercel.app/auth/google/callback",
+      callbackURL: "https://ai-all-docx-project-77.onrender.com/api/v1/auth/google/callback", // ✅ backend URL
     },
     async (accessToken, refreshToken, profile, done) => {
       try {
@@ -55,10 +54,8 @@ passport.use(
 
           user.additionalDetails = userProfile._id;
           await user.save();
-
           await user.populate("additionalDetails");
         }
-
 
         const token = jwt.sign(
           { id: user._id, email: user.email },
@@ -78,30 +75,29 @@ passport.use(
   )
 );
 
-
-// Google Routes 
 router.get(
   "/google",
-  passport.authenticate("google", { scope: ["profile", "email"], session: false }) // 👈 disable session
+  passport.authenticate("google", { scope: ["profile", "email"], session: false })
 );
 
 router.get(
   "/google/callback",
-  passport.authenticate("google", { failureRedirect: "https://ai-all-docx-project.vercel.app/register", session: false }),
+  passport.authenticate("google", {
+    failureRedirect: "https://ai-all-docx-project.vercel.app/register",
+    session: false,
+  }),
   (req, res) => {
-    
     res.redirect(`https://ai-all-docx-project.vercel.app/register?token=${req.user.token}`);
-
   }
 );
-//  Facebook Login
 
+// --- Facebook OAuth ---
 passport.use(
   new FacebookStrategy(
     {
       clientID: process.env.FB_APP_ID,
       clientSecret: process.env.FB_APP_SECRET,
-      callbackURL: "https://ai-all-docx-project.vercel.app/auth/facebook/callback",
+      callbackURL: "https://ai-all-docx-project-77.onrender.com/api/v1/auth/facebook/callback", // ✅ backend URL
       profileFields: ["id", "emails", "name", "picture.type(large)"],
     },
     async (accessToken, refreshToken, profile, done) => {
@@ -117,7 +113,7 @@ passport.use(
             authProvider: "facebook",
             isVerified: true,
           });
-          
+
           const userProfile = await Profile.create({
             userId: user._id,
             imageUrl: `https://api.dicebear.com/6.x/initials/svg?seed=${user.userName?.[0] || "U"}`,
@@ -125,7 +121,6 @@ passport.use(
 
           user.additionalDetails = userProfile._id;
           await user.save();
-
           await user.populate("additionalDetails");
         }
 
@@ -147,16 +142,20 @@ passport.use(
   )
 );
 
-// Facebook Routes
-router.get("/facebook", passport.authenticate("facebook", { scope: ["email"], session: false }));
+router.get(
+  "/facebook",
+  passport.authenticate("facebook", { scope: ["email"], session: false })
+);
 
 router.get(
   "/facebook/callback",
-  passport.authenticate("facebook", { failureRedirect: "https://ai-all-docx-project.vercel.app/register", session: false }),
+  passport.authenticate("facebook", {
+    failureRedirect: "https://ai-all-docx-project.vercel.app/register",
+    session: false,
+  }),
   (req, res) => {
     res.redirect(`https://ai-all-docx-project.vercel.app/register?token=${req.user.token}`);
   }
 );
-
 
 export default router;
