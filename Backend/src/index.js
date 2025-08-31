@@ -18,8 +18,9 @@ app.use(cookieParser());
 
 const allowedOrigins = [
   "http://localhost:5173", // local dev
-  "https://ai-all-docx-project.vercel.app"
+  "https://ai-all-docx-project.vercel.app" // Vercel frontend
 ];
+
 app.use(
   cors({
     origin: function (origin, callback) {
@@ -32,6 +33,7 @@ app.use(
     credentials: true,
   })
 );
+
 
 app.use(passport.initialize());
 
