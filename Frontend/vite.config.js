@@ -8,4 +8,5 @@ export default defineConfig({
   build: {
     outDir: "dist", // ✅ Correct place
   },
+   base: "/",
 })
