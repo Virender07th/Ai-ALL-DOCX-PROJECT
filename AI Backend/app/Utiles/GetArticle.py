@@ -1,5 +1,3 @@
-# app/Utils/article_loader.py
-
 from fastapi import HTTPException
 from app.Tools.URLTOOL.ArticleExtractor import extract_article_from_url
 from app.Fallback.SearchfallBack import Search_article_by_topic

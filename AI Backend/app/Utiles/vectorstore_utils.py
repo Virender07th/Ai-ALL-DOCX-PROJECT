@@ -2,29 +2,19 @@ import uuid
 import faiss
 import os
 from typing import Dict, List, Optional
-from langchain_huggingface import HuggingFaceEmbeddings
+from langchain_google_genai import GoogleGenerativeAIEmbeddings
 from langchain_community.vectorstores import FAISS
 from langchain_community.docstore.in_memory import InMemoryDocstore
 
-# -------------------------------
-# Global in-memory stores
-# -------------------------------
 vectorstores: Dict[str, FAISS] = {}
 metadata_store: Dict[str, List[Dict]] = {}
 
-# -------------------------------
-# Load embeddings once (global)
-# -------------------------------
-embeddings = HuggingFaceEmbeddings(model_name="sentence-transformers/all-MiniLM-L6-v2")
+embeddings = GoogleGenerativeAIEmbeddings(model="models/embedding-001")
 try:
     EMB_DIM = len(embeddings.embed_query("dimension test"))
-except Exception as e:
-    EMB_DIM = 768  # fallback (not recommended)
+except Exception:
+    EMB_DIM = 768 
 
-
-# -------------------------------
-# Vectorstore creation
-# -------------------------------
 def get_or_create_vectorstore(namespace: str) -> FAISS:
     if namespace in vectorstores:
         return vectorstores[namespace]
@@ -40,9 +30,6 @@ def get_or_create_vectorstore(namespace: str) -> FAISS:
     metadata_store[namespace] = []
     return vectorstore
 
-# -------------------------------
-# File ingestion
-# -------------------------------
 def ingest_file_to_faiss(path: str, namespace: Optional[str] = "default", source_name: Optional[str] = None) -> Dict:
     from .file_utils import load_file_text
     from .text_utils import chunk_text

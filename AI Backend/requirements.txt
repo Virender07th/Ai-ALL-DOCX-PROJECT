@@ -1,8 +1,5 @@
-# FastAPI core
 fastapi
 uvicorn
-
-# LangChain ecosystem
 langchain
 langchain-core
 langchain-community
@@ -13,23 +10,18 @@ langchain-unstructured
 langchain-exa
 langchain-tavily
 huggingface_hub[hf_xet]
-# Vector DB support
-faiss-cpu  # Optional: add if using FAISS
-# Embedding models
-sentence-transformers  # Required by HuggingFaceEmbeddings
-# Document loading & parsing
-unstructured[all-docs]
+faiss-cpu
 PyMuPDF
 newspaper3k
-lxml-html-clean  # fixed name from `lxml_html_clean`
+lxml-html-clean 
 beautifulsoup4
 docx2txt
 json5
 pdf2image
-# Utilities
 python-dotenv
 httpx
 pydantic
-ddgs  # DuckDuckGo search wrapper
+ddgs 
 firecrawl-py
 pymupdf
+python-multipart

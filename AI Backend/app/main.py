@@ -7,12 +7,6 @@ from app.Router.InterviewQGeneration_router import router as interviewQGeneratio
 from app.Router.QuizGeneration_router import router as quizGeneration_router
 from app.Router.ChatWithDocs_router import router as chatWithDocs_router
 
-
-
-
-#Ai-All-Docx-Project
-
-
 app = FastAPI()
 
 app.add_middleware(
@@ -23,7 +17,6 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# AI ALL DOCS AND VIDEO
 app.include_router(interviewQGeneration_router , prefix="/api")
 app.include_router(quizGeneration_router , prefix="/api")
 app.include_router(chatWithDocs_router, prefix="/chat", tags=["chat"])

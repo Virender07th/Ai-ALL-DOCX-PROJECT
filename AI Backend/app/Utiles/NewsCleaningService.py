@@ -4,14 +4,11 @@ from langchain_groq import ChatGroq
 from dotenv import load_dotenv
 import os
 
-# Load environment variables (for Groq API key, if needed)
 load_dotenv()
 
-# Initialize Groq LLM with LLaMA3
 llm = ChatGroq(model="llama3-8b-8192", temperature=0.1)
 parser = StrOutputParser()
 
-# Prompt template for article cleanup and formatting
 news_cleaning_prompt = PromptTemplate.from_template(
     """
 You are a strict article formatter. Your job is to clean raw news articles and format them using **only clean Markdown**.
@@ -42,11 +39,8 @@ You are a strict article formatter. Your job is to clean raw news articles and f
 """
 )
 
-
-# Create the chain
 news_cleaning_chain = news_cleaning_prompt | llm | parser
 
-# Final callable function
 def clean_and_format_news(article: str) -> str:
     return news_cleaning_chain.invoke({"article": article})
 

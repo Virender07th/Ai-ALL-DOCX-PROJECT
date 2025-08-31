@@ -8,11 +8,10 @@ from app.Utiles.jsonExtract import extract_json
 from dotenv import load_dotenv
 
 load_dotenv()
-# LLM setup
+
 llm = ChatGroq(model="llama3-70b-8192", temperature=0.2)
 parser = StrOutputParser()
 
-# Prompt (unchanged)
 interview_prompt = PromptTemplate.from_template("""
 You are an expert technical interviewer.
 
@@ -41,11 +40,8 @@ JSON Format:
 }}
 """)
 
-
-# LangChain chain
 interview_chain = interview_prompt | llm | parser
 
-# Pydantic models (unchanged)
 class InterviewQuestionItem(BaseModel):
     question: str
     answer: str
@@ -53,18 +49,15 @@ class InterviewQuestionItem(BaseModel):
 class InterviewQuestionModel(BaseModel):
     questions: List[InterviewQuestionItem]
 
-# Main function
 def generate_interview_questions(article: str, numberOfQuestions: int) -> InterviewQuestionModel:
     raw_output = interview_chain.invoke({
         "article": article,
         "numberOfQuestions": numberOfQuestions
     })
-
-    # Robust JSON extraction without changing output structure
+    
     try:
         data = extract_json(raw_output)
     except Exception:
-        # fallback: extract first JSON block
         match = re.search(r"\{.*\}", raw_output, re.DOTALL)
         if match:
             import json

@@ -2,13 +2,7 @@ import os
 import uuid
 import tempfile
 import logging
-import fitz  # PyMuPDF
-from unstructured.partition.docx import partition_docx
-from unstructured.partition.pptx import partition_pptx
-from unstructured.partition.text import partition_text
-from unstructured.partition.csv import partition_csv
-from unstructured.partition.html import partition_html
-
+import fitz 
 from app.Tools.URLTOOL.ArticleExtractor import extract_article_from_url
 
 try:
@@ -18,10 +12,8 @@ try:
 except ImportError:
     OCR_AVAILABLE = False
 
-
-# --- Save upload file temporarily ---
 def save_uploadfile_temp(upload_file) -> str:
-    MAX_UPLOAD_SIZE = 50 * 1024 * 1024  # 50 MB actually (fix comment)
+    MAX_UPLOAD_SIZE = 50 * 1024 * 1024  
     content = upload_file.file.read()
     size = len(content)
 
@@ -40,7 +32,6 @@ def save_uploadfile_temp(upload_file) -> str:
     upload_file.file.seek(0)
     return temp_path
 
-# --- Extract text from PDF ---
 def extract_text_from_pdf(path: str) -> str:
     doc = fitz.open(path)
     texts = [page.get_text() for page in doc if page.get_text()]
@@ -48,7 +39,6 @@ def extract_text_from_pdf(path: str) -> str:
     if texts:
         return "\n\n".join(texts)
 
-    # Fallback to OCR
     if OCR_AVAILABLE:
         images = convert_from_path(path)
         ocr_texts = [pytesseract.image_to_string(img) for img in images]
@@ -56,29 +46,9 @@ def extract_text_from_pdf(path: str) -> str:
         return combined
     return "" 
 
-# --- Extract text from other formats ---
-def extract_text_unstructured(path: str, ext: str) -> str:
-    if ext == ".docx":
-        elements = partition_docx(filename=path)
-    elif ext == ".pptx":
-        elements = partition_pptx(filename=path)
-    elif ext in [".txt", ".md"]:
-        elements = partition_text(filename=path)
-    elif ext == ".csv":
-        elements = partition_csv(filename=path)
-    elif ext in [".html", ".htm"]:
-        elements = partition_html(filename=path)
-    else:
-        with open(path, "r", encoding="utf-8", errors="ignore") as f:
-            return f.read()
-    text = "\n\n".join(el.text for el in elements if el.text)
-    return text
-
 def load_file_text(path: str) -> str:
     ext = os.path.splitext(path)[1].lower()
-    if ext == ".pdf":
-        return extract_text_from_pdf(path)
-    return extract_text_unstructured(path, ext)
+    return extract_text_from_pdf(path)
 
 def extract_article_text(url: str) -> str:
     return extract_article_from_url(url)

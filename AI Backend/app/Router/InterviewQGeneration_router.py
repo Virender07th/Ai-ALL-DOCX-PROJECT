@@ -8,7 +8,6 @@ from app.Utiles.GetArticle import get_article
 
 router = APIRouter()
 
-# ---------- Request Models ----------
 class InterviewRequest(BaseModel):
     topic: Optional[str] = None
     url: Optional[str] = None
@@ -21,7 +20,6 @@ class Question(BaseModel):
 class InterviewResponse(BaseModel):
     questions: list[Question]
 
-# ---------- Endpoint ----------
 @router.post("/interview-question", summary="Generate interview questions from topic or URL")
 async def interview_question(req: InterviewRequest):
     if not req.topic and not req.url:
@@ -31,18 +29,15 @@ async def interview_question(req: InterviewRequest):
         )
 
     try:
-        # Fetch article
         article = get_article(topic=req.topic, url=req.url)
         if not article or article.strip() == "":
             raise HTTPException(status_code=400, detail="Could not extract article content.")
 
-        # Generate questions
         result = generate_interview_questions(
             article=article,
             numberOfQuestions=req.numberOfQuestions
         )
 
-        # Convert to dict
         if isinstance(result, dict):
             result_data = result
         elif isinstance(result, str):
@@ -53,12 +48,10 @@ async def interview_question(req: InterviewRequest):
         else:
             result_data = result.dict()
 
-        # Extract questions
         questions_raw = result_data.get("questions", [])
         if not isinstance(questions_raw, list):
             raise HTTPException(status_code=500, detail="Invalid questions format in AI response.")
 
-        # Validate questions
         questions = [Question(**q) for q in questions_raw]
 
         return {"success": True, "questions": questions}
@@ -76,16 +69,13 @@ async def interview_question_file(
     numberOfQuestions: int = 5
 ):
     try:
-        # Save file temporarily
         from app.Utiles.file_utils import save_uploadfile_temp, load_file_text
         temp_path = save_uploadfile_temp(file)
 
-        # Extract text
         article = load_file_text(temp_path)
         if not article.strip():
             raise HTTPException(status_code=400, detail="No text extracted from file.")
 
-        # Generate questions
         result = generate_interview_questions(article=article, numberOfQuestions=numberOfQuestions)
 
         return {"success": True, "questions": result.questions}
