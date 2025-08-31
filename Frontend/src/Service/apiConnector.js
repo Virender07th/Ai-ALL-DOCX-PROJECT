@@ -6,7 +6,7 @@ const BASE_URL = "https://ai-all-docx-project-77.onrender.com";
 
 export const axiosInstance = axios.create({
   baseURL: BASE_URL,
-  timeout: 20000,
+  timeout: 60000,
 });
 
 // Request interceptor to attach token

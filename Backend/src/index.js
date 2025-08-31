@@ -15,9 +15,20 @@ cloudinaryConnect();
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
+
+const allowedOrigins = [
+  "http://localhost:5173", // local dev
+  "https://ai-all-docx-project.vercel.app"
+];
 app.use(
   cors({
-    origin: "https://ai-all-docx-project.vercel.app/",
+    origin: function (origin, callback) {
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error("CORS not allowed"));
+      }
+    },
     credentials: true,
   })
 );
