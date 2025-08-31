@@ -52,7 +52,7 @@ app.get("/", (req, res) => {
   });
 });
 
-const PORT = process.env.PORT || 8001;
+const PORT = 8000  || process.env.PORT  ;
 app.listen(PORT, () => {
   console.log(`App is running at ${PORT}`);
 });
