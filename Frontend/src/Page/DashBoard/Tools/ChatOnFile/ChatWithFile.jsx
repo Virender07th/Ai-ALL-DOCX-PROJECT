@@ -3,8 +3,6 @@ import { useDispatch } from "react-redux";
 import { Send, User, Bot, Loader2 } from "lucide-react";
 import { chatOnFile } from "../../../../Service/Operations/AiAPI";
 import ReactMarkdown from "react-markdown";
-import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
-import { oneDark } from "react-syntax-highlighter/dist/esm/styles/prism";
 
 // Adjust path
 
@@ -14,7 +12,13 @@ const bg2 =
   "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face";
 
 // Chat Bubble
-const ChatBubble = ({ isUser = false, userName, content, profileImage, timestamp }) => (
+const ChatBubble = ({
+  isUser = false,
+  userName,
+  content,
+  profileImage,
+  timestamp,
+}) => (
   <div
     className={`flex w-full gap-3 px-4 py-3 ${
       isUser ? "justify-end" : "justify-start"
@@ -25,7 +29,11 @@ const ChatBubble = ({ isUser = false, userName, content, profileImage, timestamp
       <div className="flex-shrink-0">
         <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center shadow-md ring-2 ring-blue-300/20">
           {profileImage ? (
-            <img src={profileImage} alt="profile" className="w-8 h-8 rounded-full object-cover" />
+            <img
+              src={profileImage}
+              alt="profile"
+              className="w-8 h-8 rounded-full object-cover"
+            />
           ) : (
             <Bot className="w-5 h-5 text-white" />
           )}
@@ -33,11 +41,19 @@ const ChatBubble = ({ isUser = false, userName, content, profileImage, timestamp
       </div>
     )}
 
-    <div className={`flex flex-col max-w-[75%] sm:max-w-[500px] ${isUser ? "items-end" : "items-start"}`}>
+    <div
+      className={`flex flex-col max-w-[75%] sm:max-w-[500px] ${
+        isUser ? "items-end" : "items-start"
+      }`}
+    >
       <div className="flex items-center gap-2 mb-2">
-        <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider">{userName}</span>
+        <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider">
+          {userName}
+        </span>
         <div className="w-4 h-0.5 bg-gradient-to-r from-blue-400 to-purple-400 rounded"></div>
-        {timestamp && <span className="text-xs text-slate-400">{timestamp}</span>}
+        {timestamp && (
+          <span className="text-xs text-slate-400">{timestamp}</span>
+        )}
       </div>
 
       <div
@@ -48,30 +64,8 @@ const ChatBubble = ({ isUser = false, userName, content, profileImage, timestamp
         }`}
       >
         <div className="relative z-10">
-            <ReactMarkdown
-              components={{
-                code({ node, inline, className, children, ...props }) {
-                  const match = /language-(\w+)/.exec(className || "");
-                  return !inline && match ? (
-                    <SyntaxHighlighter
-                      style={oneDark}
-                      language={match[1]}
-                      PreTag="div"
-                      {...props}
-                    >
-                      {String(children).replace(/\n$/, "")}
-                    </SyntaxHighlighter>
-                  ) : (
-                    <code className={className} {...props}>
-                      {children}
-                    </code>
-                  );
-                },
-              }}
-            >
-              {content}
-            </ReactMarkdown>
-          </div>
+          <ReactMarkdown>{content}</ReactMarkdown>
+        </div>
         {!isUser && (
           <div className="absolute inset-0 bg-gradient-to-r from-slate-200/20 to-slate-100/20 translate-x-full group-hover:translate-x-0 transition-transform duration-300 rounded-2xl"></div>
         )}
@@ -82,7 +76,11 @@ const ChatBubble = ({ isUser = false, userName, content, profileImage, timestamp
       <div className="flex-shrink-0">
         <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center shadow-md ring-2 ring-purple-300/20">
           {profileImage ? (
-            <img src={profileImage} alt="profile" className="w-8 h-8 rounded-full object-cover" />
+            <img
+              src={profileImage}
+              alt="profile"
+              className="w-8 h-8 rounded-full object-cover"
+            />
           ) : (
             <User className="w-5 h-5 text-white" />
           )}
@@ -93,13 +91,25 @@ const ChatBubble = ({ isUser = false, userName, content, profileImage, timestamp
 );
 
 // Button
-const Button = ({ click, content, condition, data, style, loading = false, icon: Icon }) => (
+const Button = ({
+  click,
+  content,
+  condition,
+  data,
+  style,
+  loading = false,
+  icon: Icon,
+}) => (
   <button
     onClick={click}
     disabled={!condition || !data || loading}
     className={`px-4 py-2 font-medium transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed hover:shadow-lg hover:scale-105 active:scale-95 flex items-center gap-2 ${style}`}
   >
-    {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : Icon ? <Icon className="w-4 h-4" /> : null}
+    {loading ? (
+      <Loader2 className="w-4 h-4 animate-spin" />
+    ) : Icon ? (
+      <Icon className="w-4 h-4" />
+    ) : null}
     {content}
   </button>
 );
@@ -153,53 +163,57 @@ const ChatWithFile = () => {
     }
   };
 
-const submitHandler = async () => {
-  const trimmed = topic.trim();
-  if (!trimmed || isLoading) return;
+  const submitHandler = async () => {
+    const trimmed = topic.trim();
+    if (!trimmed || isLoading) return;
 
-  const userMessage = {
-    sender: "user",
-    content: trimmed,
-    userName: "You",
-    profileImage: bg1,
-    timestamp: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
-  };
-
-  setMessages((prev) => [...prev, userMessage]);
-  setTopic(""); // clear input
-  if (textareaRef.current) textareaRef.current.style.height = "auto";
-
-  setIsLoading(true);
-  setIsTyping(true);
-
-  try {
-    const payload = { topic: trimmed };
-    // Dispatch async thunk and wait for response
-    const responseData = await dispatch(chatOnFile(payload));
-
-    console.log(responseData);
-    
-
-    // Safely get answer from response
-    const botReply = responseData?.answer || "Sorry, no response from bot.";
-
-    const botMessage = {
-      sender: "agent",
-      content: botReply,
-      userName: "AI Assistant",
-      profileImage: bg2,
-      timestamp: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
+    const userMessage = {
+      sender: "user",
+      content: trimmed,
+      userName: "You",
+      profileImage: bg1,
+      timestamp: new Date().toLocaleTimeString([], {
+        hour: "2-digit",
+        minute: "2-digit",
+      }),
     };
 
-    setMessages((prev) => [...prev, botMessage]);
-  } catch (error) {
-    // Error toast handled inside thunk, you can optionally handle more here
-  } finally {
-    setIsTyping(false);
-    setIsLoading(false);
-  }
-};
+    setMessages((prev) => [...prev, userMessage]);
+    setTopic(""); // clear input
+    if (textareaRef.current) textareaRef.current.style.height = "auto";
 
+    setIsLoading(true);
+    setIsTyping(true);
+
+    try {
+      const payload = { topic: trimmed };
+      // Dispatch async thunk and wait for response
+      const responseData = await dispatch(chatOnFile(payload));
+
+      console.log(responseData);
+
+      // Safely get answer from response
+      const botReply = responseData?.answer || "Sorry, no response from bot.";
+
+      const botMessage = {
+        sender: "agent",
+        content: botReply,
+        userName: "AI Assistant",
+        profileImage: bg2,
+        timestamp: new Date().toLocaleTimeString([], {
+          hour: "2-digit",
+          minute: "2-digit",
+        }),
+      };
+
+      setMessages((prev) => [...prev, botMessage]);
+    } catch (error) {
+      // Error toast handled inside thunk, you can optionally handle more here
+    } finally {
+      setIsTyping(false);
+      setIsLoading(false);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-white text-slate-800">
@@ -252,7 +266,9 @@ const submitHandler = async () => {
                   <div className="w-20 h-20 bg-blue-100 rounded-2xl flex items-center justify-center mx-auto border border-blue-200">
                     <span className="text-3xl">💬</span>
                   </div>
-                  <p className="text-lg font-medium text-slate-700">Start a conversation!</p>
+                  <p className="text-lg font-medium text-slate-700">
+                    Start a conversation!
+                  </p>
                   <p className="text-sm text-slate-500">
                     Ask me anything and I’ll help you find the answers.
                   </p>
@@ -261,7 +277,11 @@ const submitHandler = async () => {
             ) : (
               <>
                 {messages.map((msg, idx) => (
-                  <ChatBubble key={idx} {...msg} isUser={msg.sender === "user"} />
+                  <ChatBubble
+                    key={idx}
+                    {...msg}
+                    isUser={msg.sender === "user"}
+                  />
                 ))}
                 {isTyping && <TypingIndicator />}
                 <div ref={messagesEndRef} />
