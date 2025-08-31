@@ -1,5 +1,5 @@
 // const FASTAPI_BASE_URL = "http://127.0.0.1:8000/api"
-const FASTAPI_BASE_URL ="https://ai-all-docx-project-8.onrender.com"
+const FASTAPI_BASE_URL ="https://ai-all-docx-project-8.onrender.com/api"
 
 // all post
 export const AiEndpoints = {

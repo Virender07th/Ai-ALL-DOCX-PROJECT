@@ -63,7 +63,7 @@ const Register = () => {
             {/* Social Buttons */}
             <div className="flex flex-col sm:flex-row gap-4 w-full max-w-md">
               <a
-                href="https://ai-all-docx-project.vercel.app/auth/google"
+                href="https://ai-all-docx-project-77.onrender.com/api/v1/auth/google"
                 className="flex-1 flex items-center justify-center gap-3 h-12 border border-gray-300 rounded-xl hover:bg-gray-100 transition-colors duration-300 bg-white text-gray-700 font-medium text-sm"
               >
                 <FcGoogle className="w-5 h-5" />
@@ -71,7 +71,7 @@ const Register = () => {
               </a>
 
               <a
-                href="https://ai-all-docx-project.vercel.app/auth/facebook"
+                href="https://ai-all-docx-project-77.onrender.com/api/v1/auth/facebook"
                 className="flex-1 flex items-center justify-center gap-3 h-12 bg-[#1877F2] hover:bg-[#166FE5] rounded-xl transition-colors duration-300 text-white font-medium text-sm shadow-sm hover:shadow-md"
               >
                 <FaFacebook className="w-5 h-5" />
