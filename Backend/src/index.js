@@ -17,7 +17,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 app.use(
   cors({
-    origin: "https://ai-all-docx.netlify.app/",
+    origin: "https://ai-all-docx-project.vercel.app/",
     credentials: true,
   })
 );
