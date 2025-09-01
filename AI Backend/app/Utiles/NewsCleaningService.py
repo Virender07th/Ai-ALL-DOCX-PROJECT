@@ -3,7 +3,6 @@ from langchain_core.output_parsers import StrOutputParser
 from langchain_groq import ChatGroq
 from dotenv import load_dotenv
 import os
-
 load_dotenv()
 
 llm = ChatGroq(model="llama-3.1-8b-instant", temperature=0.2)
@@ -43,4 +42,3 @@ news_cleaning_chain = news_cleaning_prompt | llm | parser
 
 def clean_and_format_news(article: str) -> str:
     return news_cleaning_chain.invoke({"article": article})
-

@@ -10,12 +10,10 @@ from app.Utiles.vectorstore_utils import ingest_file_to_faiss , get_or_create_ve
 from app.Utiles.file_utils import save_uploadfile_temp
 from app.Tools.URLTOOL.ArticleExtractor import extract_article_from_url
 
-llm = ChatGroq(model="llama-3.1-8b-instant", temperature=0.4)
-
 load_dotenv()
 
-llm = ChatGroq(model=os.getenv("GROQ_MODEL", "llama3-70b-8192"),
-               temperature=float(os.getenv("GROQ_TEMPERATURE", "0.1")))
+llm = ChatGroq(model=os.getenv("GROQ_MODEL", "llama-3.1-8b-instant"),
+               temperature=float(os.getenv("GROQ_TEMPERATURE", "0.3")))
 
 def handle_file_upload(upload_file):
     temp_path = save_uploadfile_temp(upload_file)
