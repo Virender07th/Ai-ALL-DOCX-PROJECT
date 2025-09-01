@@ -11,7 +11,7 @@ from app.Utiles.jsonExtract import extract_json
 
 load_dotenv()
 
-llm = ChatGroq(model="llama3-70b-8192", temperature=0.6)
+llm = ChatGroq(model="llama-3.1-8b-instant", temperature=0.6)
 parser = StrOutputParser()
 
 

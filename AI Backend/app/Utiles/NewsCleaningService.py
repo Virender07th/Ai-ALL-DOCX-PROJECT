@@ -6,7 +6,7 @@ import os
 
 load_dotenv()
 
-llm = ChatGroq(model="llama3-8b-8192", temperature=0.1)
+llm = ChatGroq(model="llama-3.1-8b-instant", temperature=0.2)
 parser = StrOutputParser()
 
 news_cleaning_prompt = PromptTemplate.from_template(

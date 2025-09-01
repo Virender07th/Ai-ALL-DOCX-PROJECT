@@ -10,7 +10,7 @@ from app.Utiles.vectorstore_utils import ingest_file_to_faiss , get_or_create_ve
 from app.Utiles.file_utils import save_uploadfile_temp
 from app.Tools.URLTOOL.ArticleExtractor import extract_article_from_url
 
-llm = ChatGroq(model="llama3-70b-8192", temperature=0.7)
+llm = ChatGroq(model="llama-3.1-8b-instant", temperature=0.4)
 
 load_dotenv()
 
