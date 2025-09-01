@@ -1,128 +1,51 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { FileText, Clock, ClipboardList, TrendingUp } from "lucide-react";
-import { getUserProfileDetaile } from "../../../Service/Operations/ProfileAPI";
-import { toast } from "react-hot-toast";
-import { recordStats } from "framer-motion";
-// import apiConnector from "../../Service/apiConnector"; // adjust import
-// import { USER_ACTIVITY_API, USER_STATS_API } from "../../Service/ApiEndpoints";
-// Data
-const recentActivity = [
-  { title: "AI in Education.pdf", date: "2024-07-21", type: "upload", status: "completed" },
-  { title: "Notes.txt", date: "2024-07-21", type: "upload", status: "completed" },
-  { title: "Student Data.xlsx", date: "2024-07-21", type: "upload", status: "processing" },
-  { title: "Presentation.pptx", date: "2024-07-21", type: "upload", status: "completed" },
-  { title: "Classroom.jpg", date: "2024-07-21", type: "upload", status: "completed" },
-  { title: "Research.docx", date: "2024-07-21", type: "upload", status: "failed" },
-];
-
-const detailCard = [
-  { 
-    title: "Interview Question", 
-    number: "10", 
-    icon: <ClipboardList className="w-6 h-6" />, 
-    color: "from-purple-500 to-indigo-600",
-    change: "+12%",
-    trend: "up"
-  },
-  { 
-    title: "Files Uploaded", 
-    number: "5", 
-    icon: <FileText className="w-6 h-6" />, 
-    color: "from-blue-500 to-cyan-600",
-    change: "+8%",
-    trend: "up"
-  },
-  { 
-    title: "Quizzes Created", 
-    number: "12", 
-    icon: <ClipboardList className="w-6 h-6" />, 
-    color: "from-emerald-500 to-teal-600",
-    change: "+15%",
-    trend: "up"
-  },
-  { 
-    title: "Time Spent", 
-    number: "4h 30m", 
-    icon: <Clock className="w-6 h-6" />, 
-    color: "from-orange-500 to-red-600",
-    change: "+5%",
-    trend: "up"
-  },
-];
-
+import { fetchUserActivity, fetchUserStats } from "../../../Service/Operations/ProfileAPI";
 
 const MainDashboard = () => {
   const dispatch = useDispatch();
-  const user = useSelector((state) => state.profile.user);
+  const { activities, stats } = useSelector((state) => state.dashboard);
+  const { loading} = useSelector((state) => state.auth);
+  const token = localStorage.getItem("token")
+  const userName = useSelector((state) => state.profile.user?.userName);
 
-  // const [recentActivity, setRecentActivity] = useState( recentActivity || []);
-  // const [detailCard, setDetailCard] = useState(detailCard || []);
-  const [loading, setLoading] = useState(true);
+   useEffect(() => {
+  console.log("Token in MainDashboard:", token);
+  if (token) {
+    console.log("Dispatching fetchUserStats and fetchUserActivity");
+    dispatch(fetchUserActivity(token));
+    dispatch(fetchUserStats(token));
+  }
+}, [dispatch, token]);
+  const detailCard = [
+    {
+      title: "Interview Questions",
+      number: stats.interviewQuestions || 0,
+      icon: <ClipboardList />,
+      color: "from-purple-500 to-indigo-600",
+      change: "+12%",
+      trend: "up",
+    },
+    {
+      title: "Files Uploaded",
+      number: stats.filesUploaded || 0,
+      icon: <FileText />,
+      color: "from-blue-500 to-cyan-600",
+      change: "+8%",
+      trend: "up",
+    },
+    {
+      title: "Quizzes Created",
+      number: stats.quizzesCreated || 0,
+      icon: <ClipboardList />,
+      color: "from-emerald-500 to-teal-600",
+      change: "+15%",
+      trend: "up",
+    },
+  ];
 
-  // Fetch user details on mount
-  useEffect(() => {
-    dispatch(getUserProfileDetaile());
-  }, [dispatch]);
-
-  // Fetch activity and stats
-  useEffect(() => {
-    async function fetchDashboardData() {
-      setLoading(true);
-      try {
-        // const [activityRes, statsRes] = await Promise.all([
-        //   apiConnector("GET", USER_ACTIVITY_API),
-        //   apiConnector("GET", USER_STATS_API),
-        // ]);
-
-        // setRecentActivity(activityRes.data.activities || []);
-        // const stats = statsRes.data.stats || [];
-
-        // Map API stats to your card structure
-        // setDetailCard([
-        //   {
-        //     title: "Interview Questions",
-        //     number: stats.interviewQuestions || 0,
-        //     icon: <ClipboardList />,
-        //     color: "from-purple-500 to-indigo-600",
-        //     change: "+12%",
-        //     trend: "up",
-        //   },
-        //   {
-        //     title: "Files Uploaded",
-        //     number: stats.filesUploaded || 0,
-        //     icon: <FileText />,
-        //     color: "from-blue-500 to-cyan-600",
-        //     change: "+8%",
-        //     trend: "up",
-        //   },
-        //   {
-        //     title: "Quizzes Created",
-        //     number: stats.quizzesCreated || 0,
-        //     icon: <ClipboardList />,
-        //     color: "from-emerald-500 to-teal-600",
-        //     change: "+15%",
-        //     trend: "up",
-        //   },
-        //   {
-        //     title: "Time Spent",
-        //     number: stats.timeSpent || "0h 0m",
-        //     icon: <Clock />,
-        //     color: "from-orange-500 to-red-600",
-        //     change: "+5%",
-        //     trend: "up",
-        //   },
-        // ]);
-      } catch (error) {
-        console.error("Error fetching dashboard data:", error);
-        toast.error("Failed to load dashboard data");
-      } finally {
-        setLoading(false);
-      }
-    }
-
-    fetchDashboardData();
-  }, []);
+ 
 
   const getStatusBadge = (status) => {
     const statusClasses = {
@@ -132,7 +55,7 @@ const MainDashboard = () => {
     };
     return (
       <span className={`px-2 py-1 text-xs rounded-full ${statusClasses[status]}`}>
-        {status.charAt(0).toUpperCase() + status.slice(1)}
+        {status?.charAt(0).toUpperCase() + status?.slice(1)}
       </span>
     );
   };
@@ -151,7 +74,7 @@ const MainDashboard = () => {
         {/* Header */}
         <div className="space-y-2">
           <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-500 to-purple-500 bg-clip-text text-transparent">
-            Welcome back, {user?.userName || "User"} 👋
+            Welcome back, {userName || "User"} 👋
           </h1>
           <p className="text-gray-600 text-lg">
             Here's your recent activity and insights.
@@ -160,9 +83,9 @@ const MainDashboard = () => {
 
         {/* Stats Cards */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-          {detailCard.map((card, index) => (
+          {detailCard.map((card, idx) => (
             <div
-              key={index}
+              key={idx}
               className="relative group bg-gray-100 rounded-2xl border border-gray-300 p-6 hover:shadow-md transition-all duration-300"
             >
               <div className="flex items-center justify-between mb-4">
@@ -178,9 +101,6 @@ const MainDashboard = () => {
                 <p className="text-gray-500 text-sm font-medium">{card.title}</p>
                 <p className="text-3xl font-bold text-gray-900">{card.number}</p>
               </div>
-              <div
-                className={`absolute inset-0 rounded-2xl bg-gradient-to-r ${card.color} opacity-0 group-hover:opacity-5 transition-opacity duration-300`}
-              ></div>
             </div>
           ))}
         </div>
@@ -204,8 +124,8 @@ const MainDashboard = () => {
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-200">
-                {recentActivity.map((activity, index) => (
-                  <tr key={index} className="hover:bg-gray-50 transition-colors">
+                {activities.map((activity, idx) => (
+                  <tr key={idx} className="hover:bg-gray-50 transition-colors">
                     <td className="p-4">
                       <div className="flex items-center gap-3">
                         <div className="w-10 h-10 bg-gradient-to-r from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
@@ -214,7 +134,7 @@ const MainDashboard = () => {
                         <span className="text-gray-900 font-medium">{activity.title}</span>
                       </div>
                     </td>
-                    <td className="p-4 text-gray-600">{activity.date}</td>
+                    <td className="p-4 text-gray-600">{new Date(activity.date).toLocaleDateString()}</td>
                     <td className="p-4">{getStatusBadge(activity.status)}</td>
                   </tr>
                 ))}

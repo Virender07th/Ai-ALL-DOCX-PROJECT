@@ -1,8 +1,38 @@
 import axios from "axios";
 import { AiEndpoints } from "../Utils/API.js";
 import FormData from "form-data";
+import Activity from "../Models/Activity.js";
+import UserStats from "../Models/UserStats.js";
 
-const callFastAPI = async (endpoint, data, res) => {
+//
+// --- Helper: Record Activity + Update Stats ---
+//
+const recordActivityHelper = async ({ userId, title, type, status }) => {
+  try {
+    const activity = await Activity.create({ userId, title, type, status });
+
+    let stats = await UserStats.findOne({ userId });
+    if (!stats) {
+      stats = new UserStats({ userId });
+    }
+
+    if (type === "upload") stats.filesUploaded += 1;
+    if (type === "quiz") stats.quizzesCreated += 1;
+    if (type === "interview") stats.interviewQuestions += 1;
+
+    await stats.save();
+
+    return { activity, stats };
+  } catch (error) {
+    console.error("Error recording activity:", error);
+    return null; // don’t crash the API if logging fails
+  }
+};
+
+//
+// --- Reusable callFastAPI ---
+//
+const callFastAPI = async (endpoint, data, res, { userId, type, title }) => {
   try {
     const response = await axios.post(endpoint, data, {
       headers: { "Content-Type": "application/json" },
@@ -11,12 +41,17 @@ const callFastAPI = async (endpoint, data, res) => {
     const apiData = response.data;
 
     if (apiData.success) {
-      const questions = apiData.questions || [];
-      console.log("question", questions);
+      // Record activity
+      await recordActivityHelper({
+        userId,
+        title,
+        type,
+        status: "completed",
+      });
 
       return res.status(200).json({
         success: true,
-        questions,
+        questions: apiData.questions || [],
       });
     } else {
       return res.status(500).json({
@@ -35,16 +70,21 @@ const callFastAPI = async (endpoint, data, res) => {
   }
 };
 
+//
+// --- Controllers ---
+//
 const InterviewQuestion = async (req, res) => {
-  console.log(req.body);
-
   if (!req.body.topic && !req.body.url) {
     return res.status(400).json({
       success: false,
       message: "Either topic or url is required.",
     });
   }
-  await callFastAPI(AiEndpoints.Interview_Question_API, req.body, res);
+  await callFastAPI(AiEndpoints.Interview_Question_API, req.body, res, {
+    userId: req.user.id,
+    type: "interview",
+    title: req.body.topic || "Interview Question",
+  });
 };
 
 const QuizQuestion = async (req, res) => {
@@ -54,14 +94,16 @@ const QuizQuestion = async (req, res) => {
       message: "Either topic or url is required.",
     });
   }
-  await callFastAPI(AiEndpoints.Quiz_Question_API, req.body, res);
+  await callFastAPI(AiEndpoints.Quiz_Question_API, req.body, res, {
+    userId: req.user.id,
+    type: "quiz",
+    title: req.body.topic || "Quiz Question",
+  });
 };
 
 const InterviewQuestionWithFile = async (req, res) => {
   if (!req.file) {
-    return res
-      .status(400)
-      .json({ success: false, message: "File is required" });
+    return res.status(400).json({ success: false, message: "File is required" });
   }
 
   try {
@@ -80,20 +122,24 @@ const InterviewQuestionWithFile = async (req, res) => {
       { headers: formData.getHeaders() }
     );
 
+    // Record activity
+    await recordActivityHelper({
+      userId: req.user.id,
+      title: req.file.originalname,
+      type: "interview",
+      status: "completed",
+    });
+
     res.status(200).json(response.data);
   } catch (error) {
     console.error("Upload error:", error.response?.data || error.message);
-    res
-      .status(500)
-      .json({ success: false, message: "Upload error", error: error.message });
+    res.status(500).json({ success: false, message: "Upload error", error: error.message });
   }
 };
 
 const QuizQuestionWithFile = async (req, res) => {
   if (!req.file) {
-    return res
-      .status(400)
-      .json({ success: false, message: "File is required" });
+    return res.status(400).json({ success: false, message: "File is required" });
   }
 
   try {
@@ -112,20 +158,24 @@ const QuizQuestionWithFile = async (req, res) => {
       { headers: formData.getHeaders() }
     );
 
+    // Record activity
+    await recordActivityHelper({
+      userId: req.user.id,
+      title: req.file.originalname,
+      type: "quiz",
+      status: "completed",
+    });
+
     res.status(200).json(response.data);
   } catch (error) {
     console.error("Upload error:", error.response?.data || error.message);
-    res
-      .status(500)
-      .json({ success: false, message: "Upload error", error: error.message });
+    res.status(500).json({ success: false, message: "Upload error", error: error.message });
   }
 };
 
 const UploadFile = async (req, res) => {
   if (!req.file) {
-    return res
-      .status(400)
-      .json({ success: false, message: "File is required" });
+    return res.status(400).json({ success: false, message: "File is required" });
   }
 
   try {
@@ -139,20 +189,24 @@ const UploadFile = async (req, res) => {
       headers: formData.getHeaders(),
     });
 
+    // Record activity
+    await recordActivityHelper({
+      userId: req.user.id,
+      title: req.file.originalname,
+      type: "upload",
+      status: "completed",
+    });
+
     res.status(200).json(response.data);
   } catch (error) {
     console.error("Upload error:", error.response?.data || error.message);
-    res
-      .status(500)
-      .json({ success: false, message: "Upload error", error: error.message });
+    res.status(500).json({ success: false, message: "Upload error", error: error.message });
   }
 };
+
 const ChatOnDocs = async (req, res) => {
   if (!req.body.topic) {
-    return res.status(400).json({
-      success: false,
-      message: "topic is required.",
-    });
+    return res.status(400).json({ success: false, message: "topic is required." });
   }
 
   try {
@@ -169,13 +223,20 @@ const ChatOnDocs = async (req, res) => {
       });
     }
 
+    // Optional: record as "chat"
+    await recordActivityHelper({
+      userId: req.user.id,
+      title: req.body.topic,
+      type: "chat",
+      status: "completed",
+    });
+
     return res.status(200).json({
       success: true,
       answer: apiData.response?.answer || "",
     });
   } catch (error) {
     console.error(`Error calling Chat_On_Docs_API:`, error);
-
     return res.status(500).json({
       success: false,
       message: `Failed to fetch from Chat_On_Docs_API`,
@@ -183,6 +244,7 @@ const ChatOnDocs = async (req, res) => {
     });
   }
 };
+
 const ChatOnURL = async (req, res) => {
   if (!req.body.query && !req.body.url) {
     return res.status(400).json({
@@ -190,10 +252,18 @@ const ChatOnURL = async (req, res) => {
       message: "Either Query or url is required.",
     });
   }
-  await callFastAPI(AiEndpoints.Chat_On_URL_API, req.body, res);
+  await callFastAPI(AiEndpoints.Chat_On_URL_API, req.body, res, {
+    userId: req.user.id,
+    type: "chat",
+    title: req.body.url || "Chat on URL",
+  });
 };
 
+//
+// --- Export ---
+//
 export {
+  recordActivityHelper,
   InterviewQuestion,
   InterviewQuestionWithFile,
   QuizQuestion,

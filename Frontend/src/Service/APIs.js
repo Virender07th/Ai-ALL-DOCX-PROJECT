@@ -1,4 +1,4 @@
-// const BASE_URL = "http://localhost:8000/api/v1";
+// const BASE_URL = "http://localhost:8001/api/v1";
 const BASE_URL ="https://ai-all-docx-project-77.onrender.com/api/v1"
 
 // AUTH ENDPOINTS
@@ -13,6 +13,8 @@ export const authEndpoints = {
 
 // SETTINGS PAGE API
 export const profileEndpoints = {
+  GET_USER_ACTIVITY_API: BASE_URL + "/dashboard/activity",
+  GET_USER_STATS_API: BASE_URL + "/dashboard/stats",
   GET_USER_DETAILS_API: BASE_URL + "/profile/getUserProfile",
   UPDATE_DISPLAY_PICTURE_API: BASE_URL + "/profile/updateDisplayPicture",
   UPDATE_PROFILE_API: BASE_URL + "/profile/updateUserProfile",

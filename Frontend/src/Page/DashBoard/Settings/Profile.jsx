@@ -5,11 +5,13 @@ import Button from "../../../Component/Reusable/Button";
 import { useDispatch, useSelector } from "react-redux";
 import { getUserProfileDetaile } from "../../../Service/Operations/ProfileAPI";
 
+
 const Profile = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
   const { user, loading } = useSelector((state) => state.profile);
+  const { activities, stats } = useSelector((state) => state.dashboard);
 
   const { token } = useSelector((state) => state.auth);
   const tokenFromStorage = token || localStorage.getItem("token")
@@ -45,10 +47,10 @@ const Profile = () => {
     { icon: Eye, content: "View Activity", variant: "secondary" },
   ];
 
-  const stats = [
-    { value: user.videosCount || 0, label: "Videos", color: "text-blue-600" },
-    { value: user.filesCount || 0, label: "Files", color: "text-emerald-600" },
-    { value: user.quizzesCount || 0, label: "Quizzes", color: "text-purple-600" },
+  const statss = [
+    { value: stats.interviewQuestions || 0, label: "Interview Question", color: "text-blue-600" },
+    { value: stats.filesUploaded || 0, label: "Files", color: "text-emerald-600" },
+    { value: stats.quizzesCreated || 0, label: "Quizzes", color: "text-purple-600" },
   ];
 
   return (
@@ -95,7 +97,7 @@ const Profile = () => {
 
             {/* Stats */}
             <div className="grid grid-cols-3 gap-4">
-              {stats.map((s, i) => (
+              {statss.map((s, i) => (
                 <div key={i} className="bg-gray-200 rounded-xl p-4 text-center border border-gray-300">
                   <div className={`text-2xl font-bold ${s.color} mb-1`}>{s.value}</div>
                   <div className="text-gray-500 text-sm">{s.label}</div>

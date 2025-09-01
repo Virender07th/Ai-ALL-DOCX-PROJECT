@@ -49,10 +49,13 @@ app.use(passport.initialize());
 import userRoutes from "./Routes/AuthRoutes.js";
 import aiRoutes from "./Routes/AIRoutes.js";
 import profileRoutes from "./Routes/ProfileRoutes.js";
+import dashboardRoutes from "./Routes/Dashboard.js";
+
 
 app.use("/api/v1/auth", userRoutes);
 app.use("/api/v1/ai", aiRoutes);
 app.use("/api/v1/profile", profileRoutes);
+app.use("/api/v1/dashboard", dashboardRoutes);
 
 // test route
 app.get("/", (req, res) => {
