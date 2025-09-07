@@ -6,7 +6,7 @@ from app.Tools.SearchTool.GoogleSepher import search_snippet_using_serper
 from langchain_groq import ChatGroq
 
 
-llm = ChatGroq(model="llama3-70b-8192", temperature=0.7)
+llm = ChatGroq(model="llama-3.1-8b-instant", temperature=0.2)
 
 def preprocess_topic_for_search(topic: str) -> str:
     """
